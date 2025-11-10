@@ -1,0 +1,89 @@
+import pandas as pd
+import numpy as np
+import pyplot as plt
+x_set = np.arange(2, 13)
+y_set = np.arange(1, 7)
+def f_XY(x, y):
+    if 1 <= y <=6 and 1 <= x - y <= 6:
+        return y * (x-y) / 441
+    else:
+        return 0
+XY = [x_set, y_set, f_XY]
+prob = np.array([[f_XY(x_i, y_j) for y_j in y_set]
+                 for x_i in x_set])
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111)
+
+c= ax.pcolor(prob)
+ax.set_xticks(np.arrange(prob.shape[1]) + 0.5, minor=False)
+ax.set_yticks(np.arrange(prob.shape[0]) + 0.5, minor=False)
+ax.set_xticklabels(np.arange(1, 7), minor=False)
+ax.set_yticklabels(np.arange(2, 13), minor=False)
+ax.invert_yaxis()
+ax.xaxis.tick_top()
+fig.colorbar(c,ax=ax)
+plt.show()
+np.all(prob >=0)
+np.sum(prob)
+def f_X(x):
+    return np.sum([f_XY(x, y_k) for y_k in y_set])
+def f_Y(y):
+    return np.sum([f_XY(x_k, y) for x_k in x_set])
+X = [x_set, f_X]
+Y = [y_set. f_Y]
+prob_x = np.array([f_X(x) for x in x_set])
+prob_y = np.array([f_Y(y) for y in y_set])
+
+fig = plt.figure(figsize=(12, 4))
+ax1 = fig.add_subplot(121)
+ax2 = fig.add_subplot(122)
+
+ax1.bar(x_set, prob_x)
+ax1.set_title('Marginal probability distribution')
+ax1.set_xlabel('x')
+ax1.set_ylabel('Probability')
+ax1.set_xticks(x_set)
+
+ax2.bar(y_set, prob_y)
+ax2.set_title('Marginal probability distribution')
+ax2.set_xlabel('y')
+ax2.set_ylabel('Probability')
+ax2.set_xticks(y_set)
+
+plt.show()
+np.sum([x_i * f_XY(x_i, y_j) for x_i in x_set for y_j in y_set])
+def E(XY, g):
+    x_set, y_set, f_XY = XY
+    return np.sum([g[x_i, y_j) * f_XY(x_i, y_j)
+                    for x_i in x_set for y_j in y_set])
+mean_X = E(XY, lambda x, y: x)
+mean_X
+mean_Y = E(XY, lambda x, y: y)
+mean_Y
+a, b = 2, 3
+
+E(XY, lambda x, y: a*x + b*y)
+a * mean_X + b * mean_Y
+np.sum(((x_i - mean_X)**2 * f_XY(x_i, y_j) 
+        for x_i in x_set for y_j in y_set))
+def V(XY, g):
+    x_set, y_set, f_XY = XY
+    mean = E(XY, g)
+
+    return np.sum([(g(x_i, y_j) - mean)**2 * f_XY(x_i, y_j)
+                   for x_i in x_set for y_j in y_set])
+var_X = V(XY, g=lambda x, y: x)
+var_X
+var_Y = V(XY, g=lambda x, y: y)
+var_Y
+def Cov(XY):
+    x_set, y_set, f_XY = XY
+    mean_X = E(XY, lambda x, y: x)
+    mean_Y = E(XY, lambda x, y: y)
+    return np.sum([(x_i - mean_X) * (y_j - mean_Y) * f_XY(x_i, y_j)
+                   for x_i in x_set for y_j in y_set])
+
+cov_xy = Cov(XY)
+cov_xy
+V(XY, lambda x, y: a*x + b*y)
+a**2 * var_X + b**2 * var_Y + 2*a*b * cov_xy
